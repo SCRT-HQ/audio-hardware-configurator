@@ -8,7 +8,7 @@ import { useAudioDeviceStore } from "./hooks/useAudioDeviceStore";
 import DeviceNode from "./components/DeviceNode";
 import ConnectionLine from "./components/ConnectionLine";
 import DarkModeToggle from "./components/DarkModeToggle";
-import DeviceCustomizationForm from "./components/DeviceCustomizationForm";
+import AddDeviceForm from "./components/AddDeviceForm";
 import { Device, Connection } from "./types/devices";
 import { DOT_SIZE, GRID_SIZE } from "./constants/grid";
 import EditDeviceForm from "./components/EditDeviceForm";
@@ -157,7 +157,7 @@ function AudioDeviceArrangerApp() {
           <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">
             Add Device
           </h2>
-          <DeviceCustomizationForm onAddDevice={handleAddCustomDevice} />
+          <AddDeviceForm onAddDevice={handleAddCustomDevice} />
         </div>
 
         <Dialog.Portal>

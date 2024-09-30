@@ -2,13 +2,11 @@ import React, { useState } from "react";
 import { Device, Port } from "../types/devices";
 import * as Form from "@radix-ui/react-form";
 
-interface DeviceCustomizationFormProps {
+interface AddDeviceFormProps {
   onAddDevice: (device: Omit<Device, "id">) => void;
 }
 
-const DeviceCustomizationForm: React.FC<DeviceCustomizationFormProps> = ({
-  onAddDevice,
-}) => {
+const AddDeviceForm: React.FC<AddDeviceFormProps> = ({ onAddDevice }) => {
   const [name, setName] = useState("");
   const [type, setType] = useState("synthesizer");
   const [gridSize, setGridSize] = useState(100);
@@ -150,4 +148,4 @@ const DeviceCustomizationForm: React.FC<DeviceCustomizationFormProps> = ({
   );
 };
 
-export default DeviceCustomizationForm;
+export default AddDeviceForm;
