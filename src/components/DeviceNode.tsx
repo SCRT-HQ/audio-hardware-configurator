@@ -10,7 +10,12 @@ interface DeviceNodeProps {
   onMove: (id: string, position: { x: number; y: number }) => void;
   onEdit: (device: Device) => void;
   onDelete: (id: string) => void;
-  onPortClick: (deviceId: string, portId: string, isOutput: boolean) => void;
+  onPortClick: (
+    deviceId: string,
+    portId: string,
+    isOutput: boolean,
+    event: React.MouseEvent
+  ) => void;
   isConnecting: boolean;
   gridWidth: number;
   gridHeight: number;
@@ -105,12 +110,25 @@ const DeviceNode: React.FC<DeviceNodeProps> = ({
       {ports.map((port) => (
         <div
           key={port.id}
-          className={`text-xs cursor-pointer ${
-            isConnecting ? "hover:bg-blue-200 dark:hover:bg-blue-700" : ""
-          } text-gray-600 dark:text-gray-400`}
+          className={`
+            text-xs cursor-pointer
+            ${
+              isConnecting
+                ? isOutput
+                  ? "hover:bg-green-200 dark:hover:bg-green-700"
+                  : "hover:bg-blue-200 dark:hover:bg-blue-700"
+                : ""
+            }
+            ${
+              isOutput
+                ? "text-green-600 dark:text-green-400"
+                : "text-blue-600 dark:text-blue-400"
+            }
+            p-1 rounded transition-colors
+          `}
           onClick={(e) => {
             e.stopPropagation();
-            onPortClick(device.id, port.id, isOutput);
+            onPortClick(device.id, port.id, isOutput, e);
           }}
         >
           {port.name}

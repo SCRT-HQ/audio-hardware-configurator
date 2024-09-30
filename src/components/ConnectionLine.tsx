@@ -7,6 +7,7 @@ interface ConnectionLineProps {
   startY: number;
   endX: number;
   endY: number;
+  isTemp?: boolean;
 }
 
 const ConnectionLine: React.FC<ConnectionLineProps> = ({
@@ -14,7 +15,14 @@ const ConnectionLine: React.FC<ConnectionLineProps> = ({
   startY,
   endX,
   endY,
+  isTemp = false,
 }) => {
+  // Calculate control points for a quadratic bezier curve
+  const midX = (startX + endX) / 2;
+  const midY = (startY + endY) / 2;
+  const controlX = midX;
+  const controlY = midY - Math.abs(endY - startY) / 2;
+
   return (
     <svg
       style={{
@@ -26,13 +34,12 @@ const ConnectionLine: React.FC<ConnectionLineProps> = ({
         pointerEvents: "none",
       }}
     >
-      <line
-        x1={startX}
-        y1={startY}
-        x2={endX}
-        y2={endY}
-        stroke="black"
+      <path
+        d={`M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`}
+        fill="none"
+        stroke={isTemp ? "rgba(59, 130, 246, 0.5)" : "rgb(59, 130, 246)"}
         strokeWidth="2"
+        strokeDasharray={isTemp ? "5,5" : "none"}
       />
     </svg>
   );

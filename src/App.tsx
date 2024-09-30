@@ -39,6 +39,10 @@ function AudioDeviceArrangerApp() {
     deviceId: string;
     portId: string;
   } | null>(null);
+  const [tempConnection, setTempConnection] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   const handleAddCustomDevice = (deviceData: Omit<Device, "id">) => {
     addDevice({
@@ -58,7 +62,6 @@ function AudioDeviceArrangerApp() {
 
   const handleDeleteDevice = (id: string) => {
     deleteDevice(id);
-    // Remove any connections associated with this device
     setConnections(
       connections.filter(
         (conn) => conn.sourceDeviceId !== id && conn.targetDeviceId !== id
@@ -69,12 +72,14 @@ function AudioDeviceArrangerApp() {
   const handlePortClick = (
     deviceId: string,
     portId: string,
-    isOutput: boolean
+    isOutput: boolean,
+    event: React.MouseEvent
   ) => {
     if (connectingFrom) {
       if (isOutput || connectingFrom.deviceId === deviceId) {
         // Can't connect output to output or to the same device
         setConnectingFrom(null);
+        setTempConnection(null);
         return;
       }
       // Complete the connection
@@ -87,9 +92,11 @@ function AudioDeviceArrangerApp() {
       };
       setConnections([...connections, newConnection]);
       setConnectingFrom(null);
+      setTempConnection(null);
     } else if (isOutput) {
       // Start a new connection from an output port
       setConnectingFrom({ deviceId, portId });
+      setTempConnection({ x: event.clientX, y: event.clientY });
     }
   };
 
@@ -125,6 +132,19 @@ function AudioDeviceArrangerApp() {
       width: Math.max(prevSize.width, newPosition.x + GRID_SIZE),
       height: Math.max(prevSize.height, newPosition.y + GRID_SIZE),
     }));
+  };
+
+  const handleMouseMove = (event: React.MouseEvent) => {
+    if (connectingFrom) {
+      setTempConnection({ x: event.clientX, y: event.clientY });
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (connectingFrom) {
+      setConnectingFrom(null);
+      setTempConnection(null);
+    }
   };
 
   if (isLoading)
@@ -191,7 +211,12 @@ function AudioDeviceArrangerApp() {
         </header>
 
         {/* Grid */}
-        <div ref={gridContainerRef} className="flex-1 overflow-auto">
+        <div
+          ref={gridContainerRef}
+          className="flex-1 overflow-auto"
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+        >
           <div
             className="border border-gray-300 dark:border-gray-600 relative transition-colors"
             style={dotMatrixStyle}
@@ -215,6 +240,23 @@ function AudioDeviceArrangerApp() {
                 />
               );
             })}
+            {connectingFrom && tempConnection && (
+              <ConnectionLine
+                startX={
+                  devices.find((d) => d.id === connectingFrom.deviceId)!
+                    .position.x +
+                  GRID_SIZE * 1.5
+                }
+                startY={
+                  devices.find((d) => d.id === connectingFrom.deviceId)!
+                    .position.y +
+                  GRID_SIZE * 1.5
+                }
+                endX={tempConnection.x}
+                endY={tempConnection.y}
+                isTemp={true}
+              />
+            )}
             {devices.map((device) => (
               <DeviceNode
                 key={device.id}
