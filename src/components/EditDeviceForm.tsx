@@ -1,12 +1,12 @@
 // src/components/EditDeviceForm.tsx
 
-import React, { useState } from "react";
-import { Device, Port } from "../types/devices";
+import React, { useState } from 'react'
+import { Device, Port } from '../types/devices'
 
 interface EditDeviceFormProps {
-  device: Device;
-  onUpdateDevice: (updatedDevice: Device) => void;
-  onCancel: () => void;
+  device: Device
+  onUpdateDevice: (updatedDevice: Device) => void
+  onCancel: () => void
 }
 
 const EditDeviceForm: React.FC<EditDeviceFormProps> = ({
@@ -14,11 +14,11 @@ const EditDeviceForm: React.FC<EditDeviceFormProps> = ({
   onUpdateDevice,
   onCancel,
 }) => {
-  const [name, setName] = useState(device.name);
-  const [type, setType] = useState(device.type);
-  const [gridSize, setGridSize] = useState(device.gridSize);
-  const [inputs, setInputs] = useState<Port[]>(device.inputs);
-  const [outputs, setOutputs] = useState<Port[]>(device.outputs);
+  const [name, setName] = useState(device.name)
+  const [type, setType] = useState(device.type)
+  const [gridSize, setGridSize] = useState(device.gridSize)
+  const [inputs, setInputs] = useState<Port[]>(device.inputs)
+  const [outputs, setOutputs] = useState<Port[]>(device.outputs)
 
   const handleAddInput = () => {
     setInputs([
@@ -26,10 +26,10 @@ const EditDeviceForm: React.FC<EditDeviceFormProps> = ({
       {
         id: `input-${Date.now()}`,
         name: `Input ${inputs.length + 1}`,
-        type: "input",
+        type: 'input',
       },
-    ]);
-  };
+    ])
+  }
 
   const handleAddOutput = () => {
     setOutputs([
@@ -37,13 +37,13 @@ const EditDeviceForm: React.FC<EditDeviceFormProps> = ({
       {
         id: `output-${Date.now()}`,
         name: `Output ${outputs.length + 1}`,
-        type: "output",
+        type: 'output',
       },
-    ]);
-  };
+    ])
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     onUpdateDevice({
       ...device,
       name,
@@ -51,8 +51,8 @@ const EditDeviceForm: React.FC<EditDeviceFormProps> = ({
       gridSize,
       inputs,
       outputs,
-    });
-  };
+    })
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -67,7 +67,7 @@ const EditDeviceForm: React.FC<EditDeviceFormProps> = ({
           type="text"
           id="name"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={e => setName(e.target.value)}
           required
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
         />
@@ -83,7 +83,7 @@ const EditDeviceForm: React.FC<EditDeviceFormProps> = ({
           type="text"
           id="type"
           value={type}
-          onChange={(e) => setType(e.target.value)}
+          onChange={e => setType(e.target.value)}
           required
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
         />
@@ -99,7 +99,7 @@ const EditDeviceForm: React.FC<EditDeviceFormProps> = ({
           type="number"
           id="gridSize"
           value={gridSize}
-          onChange={(e) => setGridSize(Number(e.target.value))}
+          onChange={e => setGridSize(Number(e.target.value))}
           required
           min="100"
           max="2000"
@@ -146,7 +146,7 @@ const EditDeviceForm: React.FC<EditDeviceFormProps> = ({
         </button>
       </div>
     </form>
-  );
-};
+  )
+}
 
-export default EditDeviceForm;
+export default EditDeviceForm

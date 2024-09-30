@@ -1,24 +1,24 @@
 // src/components/DeviceNode.tsx
 
-import React, { useRef, useEffect, useState, useCallback } from "react";
-import * as Tooltip from "@radix-ui/react-tooltip";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { Device, Port } from "../types/devices";
+import React, { useRef, useEffect, useState, useCallback } from 'react'
+import * as Tooltip from '@radix-ui/react-tooltip'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import { Device, Port } from '../types/devices'
 
 interface DeviceNodeProps {
-  device: Device;
-  onMove: (id: string, position: { x: number; y: number }) => void;
-  onEdit: (device: Device) => void;
-  onDelete: (id: string) => void;
+  device: Device
+  onMove: (id: string, position: { x: number; y: number }) => void
+  onEdit: (device: Device) => void
+  onDelete: (id: string) => void
   onPortClick: (
     deviceId: string,
     portId: string,
     isOutput: boolean,
-    event: React.MouseEvent
-  ) => void;
-  isConnecting: boolean;
-  gridWidth: number;
-  gridHeight: number;
+    event: React.MouseEvent,
+  ) => void
+  isConnecting: boolean
+  gridWidth: number
+  gridHeight: number
 }
 
 const DeviceNode: React.FC<DeviceNodeProps> = ({
@@ -31,83 +31,83 @@ const DeviceNode: React.FC<DeviceNodeProps> = ({
   gridWidth,
   gridHeight,
 }) => {
-  const nodeRef = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState(device.position);
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStartRef = useRef({ x: 0, y: 0 });
-  const [nodeSize, setNodeSize] = useState({ width: 0, height: 0 });
+  const nodeRef = useRef<HTMLDivElement>(null)
+  const [position, setPosition] = useState(device.position)
+  const [isDragging, setIsDragging] = useState(false)
+  const dragStartRef = useRef({ x: 0, y: 0 })
+  const [nodeSize, setNodeSize] = useState({ width: 0, height: 0 })
 
-  console.log("inputs", gridWidth, gridHeight, nodeSize);
+  console.log('inputs', gridWidth, gridHeight, nodeSize)
 
   useEffect(() => {
-    setPosition(device.position);
-  }, [device.position]);
+    setPosition(device.position)
+  }, [device.position])
 
   useEffect(() => {
     if (nodeRef.current) {
       setNodeSize({
         width: nodeRef.current.offsetWidth,
         height: nodeRef.current.offsetHeight,
-      });
+      })
     }
-  }, []);
+  }, [])
 
   const snapToGrid = useCallback(
     (x: number, y: number) => {
-      const snappedX = Math.round(x / device.gridSize) * device.gridSize;
-      const snappedY = Math.round(y / device.gridSize) * device.gridSize;
-      return { x: snappedX, y: snappedY };
+      const snappedX = Math.round(x / device.gridSize) * device.gridSize
+      const snappedY = Math.round(y / device.gridSize) * device.gridSize
+      return { x: snappedX, y: snappedY }
     },
-    [device.gridSize]
-  );
+    [device.gridSize],
+  )
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging) return;
+      if (!isDragging) return
 
-      const dx = e.clientX - dragStartRef.current.x;
-      const dy = e.clientY - dragStartRef.current.y;
+      const dx = e.clientX - dragStartRef.current.x
+      const dy = e.clientY - dragStartRef.current.y
 
-      setPosition((prevPos) => ({
+      setPosition(prevPos => ({
         x: prevPos.x + dx,
         y: prevPos.y + dy,
-      }));
+      }))
 
-      dragStartRef.current = { x: e.clientX, y: e.clientY };
-    };
+      dragStartRef.current = { x: e.clientX, y: e.clientY }
+    }
 
     const handleMouseUp = () => {
       if (isDragging) {
-        setIsDragging(false);
-        const snappedPosition = snapToGrid(position.x, position.y);
-        setPosition(snappedPosition);
-        onMove(device.id, snappedPosition);
+        setIsDragging(false)
+        const snappedPosition = snapToGrid(position.x, position.y)
+        setPosition(snappedPosition)
+        onMove(device.id, snappedPosition)
       }
-    };
+    }
 
     if (isDragging) {
-      window.addEventListener("mousemove", handleMouseMove);
-      window.addEventListener("mouseup", handleMouseUp);
+      window.addEventListener('mousemove', handleMouseMove)
+      window.addEventListener('mouseup', handleMouseUp)
     }
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isDragging, device.id, onMove, position, snapToGrid]);
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [isDragging, device.id, onMove, position, snapToGrid])
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-    dragStartRef.current = { x: e.clientX, y: e.clientY };
-  };
+    e.preventDefault()
+    setIsDragging(true)
+    dragStartRef.current = { x: e.clientX, y: e.clientY }
+  }
 
   const renderPorts = (ports: Port[], isOutput: boolean) => (
-    <div className={`${isOutput ? "outputs" : "inputs"} mt-2`}>
+    <div className={`${isOutput ? 'outputs' : 'inputs'} mt-2`}>
       <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
-        {isOutput ? "Outputs" : "Inputs"}
+        {isOutput ? 'Outputs' : 'Inputs'}
       </h4>
-      {ports.map((port) => (
+      {ports.map(port => (
         <div
           key={port.id}
           className={`
@@ -115,27 +115,27 @@ const DeviceNode: React.FC<DeviceNodeProps> = ({
             ${
               isConnecting
                 ? isOutput
-                  ? "hover:bg-green-200 dark:hover:bg-green-700"
-                  : "hover:bg-blue-200 dark:hover:bg-blue-700"
-                : ""
+                  ? 'hover:bg-green-200 dark:hover:bg-green-700'
+                  : 'hover:bg-blue-200 dark:hover:bg-blue-700'
+                : ''
             }
             ${
               isOutput
-                ? "text-green-600 dark:text-green-400"
-                : "text-blue-600 dark:text-blue-400"
+                ? 'text-green-600 dark:text-green-400'
+                : 'text-blue-600 dark:text-blue-400'
             }
             p-1 rounded transition-colors
           `}
-          onClick={(e) => {
-            e.stopPropagation();
-            onPortClick(device.id, port.id, isOutput, e);
+          onClick={e => {
+            e.stopPropagation()
+            onPortClick(device.id, port.id, isOutput, e)
           }}
         >
           {port.name}
         </div>
       ))}
     </div>
-  );
+  )
 
   return (
     <Tooltip.Provider>
@@ -147,7 +147,7 @@ const DeviceNode: React.FC<DeviceNodeProps> = ({
             style={{
               left: `${position.x}px`,
               top: `${position.y}px`,
-              cursor: isDragging ? "grabbing" : "grab",
+              cursor: isDragging ? 'grabbing' : 'grab',
               width: `${device.gridSize * 3}px`,
               height: `${device.gridSize * 3}px`,
             }}
@@ -162,7 +162,7 @@ const DeviceNode: React.FC<DeviceNodeProps> = ({
             {renderPorts(device.inputs, false)}
             {renderPorts(device.outputs, true)}
             <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-              Grid: ({Math.round(position.x / device.gridSize)},{" "}
+              Grid: ({Math.round(position.x / device.gridSize)},{' '}
               {Math.round(position.y / device.gridSize)})
             </div>
             <DropdownMenu.Root>
@@ -199,7 +199,7 @@ const DeviceNode: React.FC<DeviceNodeProps> = ({
         </Tooltip.Portal>
       </Tooltip.Root>
     </Tooltip.Provider>
-  );
-};
+  )
+}
 
-export default DeviceNode;
+export default DeviceNode

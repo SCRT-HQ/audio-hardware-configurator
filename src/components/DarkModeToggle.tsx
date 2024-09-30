@@ -1,10 +1,10 @@
 // src/components/DarkModeToggle.tsx
 
-import React from "react";
+import React from 'react'
 
 interface DarkModeToggleProps {
-  isDarkMode: boolean;
-  toggleDarkMode: () => void;
+  isDarkMode: boolean
+  toggleDarkMode: () => void
 }
 
 const DarkModeToggle: React.FC<DarkModeToggleProps> = ({
@@ -48,7 +48,7 @@ const DarkModeToggle: React.FC<DarkModeToggleProps> = ({
         </svg>
       )}
     </button>
-  );
-};
+  )
+}
 
-export default DarkModeToggle;
+export default DarkModeToggle

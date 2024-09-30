@@ -1,17 +1,17 @@
-import React, { useState } from "react";
-import { Device, Port } from "../types/devices";
-import * as Form from "@radix-ui/react-form";
+import React, { useState } from 'react'
+import { Device, Port } from '../types/devices'
+import * as Form from '@radix-ui/react-form'
 
 interface AddDeviceFormProps {
-  onAddDevice: (device: Omit<Device, "id">) => void;
+  onAddDevice: (device: Omit<Device, 'id'>) => void
 }
 
 const AddDeviceForm: React.FC<AddDeviceFormProps> = ({ onAddDevice }) => {
-  const [name, setName] = useState("");
-  const [type, setType] = useState("synthesizer");
-  const [gridSize, setGridSize] = useState(100);
-  const [inputs, setInputs] = useState<Port[]>([]);
-  const [outputs, setOutputs] = useState<Port[]>([]);
+  const [name, setName] = useState('')
+  const [type, setType] = useState('synthesizer')
+  const [gridSize, setGridSize] = useState(100)
+  const [inputs, setInputs] = useState<Port[]>([])
+  const [outputs, setOutputs] = useState<Port[]>([])
 
   const handleAddDevice = () => {
     onAddDevice({
@@ -23,8 +23,8 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({ onAddDevice }) => {
       inputs: [],
       outputs: [],
       position: { x: 0, y: 0 },
-    });
-  };
+    })
+  }
 
   const handleAddInput = () => {
     setInputs([
@@ -32,10 +32,10 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({ onAddDevice }) => {
       {
         id: `input-${Date.now()}`,
         name: `Input ${inputs.length + 1}`,
-        type: "input",
+        type: 'input',
       },
-    ]);
-  };
+    ])
+  }
 
   const handleAddOutput = () => {
     setOutputs([
@@ -43,10 +43,10 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({ onAddDevice }) => {
       {
         id: `output-${Date.now()}`,
         name: `Output ${outputs.length + 1}`,
-        type: "output",
+        type: 'output',
       },
-    ]);
-  };
+    ])
+  }
 
   return (
     <Form.Root className="space-y-4 p-4 bg-white dark:bg-gray-800 shadow-md rounded-md">
@@ -58,7 +58,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({ onAddDevice }) => {
           <input
             type="text"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={e => setName(e.target.value)}
             className="p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           />
         </Form.Control>
@@ -71,7 +71,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({ onAddDevice }) => {
           <input
             type="text"
             value={type}
-            onChange={(e) => setType(e.target.value)}
+            onChange={e => setType(e.target.value)}
             className="p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           />
         </Form.Control>
@@ -84,7 +84,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({ onAddDevice }) => {
           <input
             type="number"
             value={gridSize}
-            onChange={(e) => setGridSize(Number(e.target.value))}
+            onChange={e => setGridSize(Number(e.target.value))}
             className="p-2 border border-gray-300 dark:border-gray-700 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           />
         </Form.Control>
@@ -111,7 +111,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({ onAddDevice }) => {
             <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
               Inputs
             </h3>
-            {inputs.map((input) => (
+            {inputs.map(input => (
               <div
                 key={input.id}
                 className="text-xs text-gray-700 dark:text-gray-400"
@@ -124,7 +124,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({ onAddDevice }) => {
             <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
               Outputs
             </h3>
-            {outputs.map((output) => (
+            {outputs.map(output => (
               <div
                 key={output.id}
                 className="text-xs text-gray-700 dark:text-gray-400"
@@ -145,7 +145,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({ onAddDevice }) => {
         </button>
       </div>
     </Form.Root>
-  );
-};
+  )
+}
 
-export default AddDeviceForm;
+export default AddDeviceForm
