@@ -99,7 +99,7 @@ const DeviceNode: React.FC<DeviceNodeProps> = ({
 
   const renderPorts = (ports: Port[], isOutput: boolean) => (
     <div className={`${isOutput ? "outputs" : "inputs"} mt-2`}>
-      <h4 className="text-sm font-semibold">
+      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
         {isOutput ? "Outputs" : "Inputs"}
       </h4>
       {ports.map((port) => (
@@ -107,7 +107,7 @@ const DeviceNode: React.FC<DeviceNodeProps> = ({
           key={port.id}
           className={`text-xs cursor-pointer ${
             isConnecting ? "hover:bg-blue-200 dark:hover:bg-blue-700" : ""
-          }`}
+          } text-gray-600 dark:text-gray-400`}
           onClick={(e) => {
             e.stopPropagation();
             onPortClick(device.id, port.id, isOutput);
