@@ -112,10 +112,12 @@ function AudioDeviceArrangerApp() {
   const defaultEdgeOptions = useMemo(
     () => ({
       style: {
-        strokeWidth: 2,
+        strokeWidth: 1,
         stroke: isDarkMode ? '#a0aec0' : '#4a5568',
       },
       animated: true,
+      zIndex: 1010,
+      type: 'arrow',
     }),
     [isDarkMode],
   )
@@ -242,6 +244,7 @@ function AudioDeviceArrangerApp() {
           proOptions={{ hideAttribution: true }}
           style={{ zIndex: 0 }}
           defaultEdgeOptions={defaultEdgeOptions}
+          // defaultEdgeOptions={{ type: 'custom' }}
           fitView
           fitViewOptions={{ padding: 0.2, minZoom: 0.5, maxZoom: 2 }}
           className={isDarkMode ? 'dark-flow' : ''}
