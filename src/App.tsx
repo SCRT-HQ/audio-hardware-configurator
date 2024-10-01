@@ -13,7 +13,6 @@ import {
   Edge,
   Connection,
   ConnectionLineType,
-  ConnectionLineComponent,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import './reactflow-dark.css'
@@ -27,6 +26,7 @@ import DarkModeToggle from './components/DarkModeToggle'
 import AddDeviceForm from './components/AddDeviceForm'
 import { Device } from './types/devices'
 import EditDeviceForm from './components/EditDeviceForm'
+import CustomConnectionLine from './components/CustomConnectionLine'
 
 const queryClient = new QueryClient()
 
@@ -34,45 +34,11 @@ const nodeTypes = {
   customNode: CustomNode,
 }
 
-const CustomConnectionLine: ConnectionLineComponent = ({
-  fromX,
-  fromY,
-  toX,
-  toY,
-  connectionLineStyle,
-}: {
-  fromX: number
-  fromY: number
-  toX: number
-  toY: number
-  connectionLineStyle?: React.CSSProperties
-}) => {
-  // Calculate midpoint
-  const midX = (fromX + toX) / 2
-  const midY = (fromY + toY) / 2
-
-  // Create a curved path
-  const path = `M${fromX},${fromY} Q${midX},${fromY} ${midX},${midY} T${toX},${toY}`
-
-  return (
-    <g>
-      <path
-        fill="none"
-        stroke={connectionLineStyle?.stroke || '#999'}
-        strokeWidth={connectionLineStyle?.strokeWidth || 2}
-        className="animated"
-        d={path}
-      />
-    </g>
-  )
-}
-
 function AudioDeviceArrangerApp() {
   const {
     devices,
     isLoading,
     addDevice,
-    // updateDevicePosition,
     updateDevice,
     deleteDevice,
     addConnection,
@@ -87,6 +53,7 @@ function AudioDeviceArrangerApp() {
   })
 
   const [editingDevice, setEditingDevice] = useState<Device | null>(null)
+  const [isAddingDevice, setIsAddingDevice] = useState(false)
 
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(isDarkMode))
@@ -162,6 +129,7 @@ function AudioDeviceArrangerApp() {
       position: { x: 100, y: 100 },
     }
     addDevice(newDevice)
+    setIsAddingDevice(false)
   }
 
   const handleEditDevice = (device: Device) => {
@@ -191,19 +159,69 @@ function AudioDeviceArrangerApp() {
     )
 
   return (
-    <div className={`flex h-screen ${isDarkMode ? 'dark' : ''}`}>
-      {/* Toolbar */}
+    <div className={`flex flex-col h-screen ${isDarkMode ? 'dark' : ''}`}>
+      {/* Header */}
+      <header className="bg-white dark:bg-gray-800 p-4 shadow-md flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+          Audio Hardware Configurator
+        </h1>
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => setIsAddingDevice(true)}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          >
+            Add Device
+          </button>
+          <DarkModeToggle
+            isDarkMode={isDarkMode}
+            toggleDarkMode={toggleDarkMode}
+          />
+        </div>
+      </header>
+
+      {/* Main content area */}
+      <div className="flex-1 bg-gray-100 dark:bg-gray-900">
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          nodeTypes={nodeTypes}
+          defaultEdgeOptions={defaultEdgeOptions}
+          fitView
+          fitViewOptions={{ padding: 0.2, minZoom: 0.5, maxZoom: 2 }}
+          className={isDarkMode ? 'dark-flow' : ''}
+          connectionLineType={ConnectionLineType.SmoothStep}
+          connectionLineComponent={CustomConnectionLine}
+        >
+          <Controls className={isDarkMode ? 'dark-controls' : ''} />
+          <MiniMap className={isDarkMode ? 'dark-minimap' : ''} />
+          <Background color={isDarkMode ? '#555' : '#aaa'} gap={16} />
+        </ReactFlow>
+      </div>
+
+      {/* Add Device Dialog */}
+      <Dialog.Root
+        open={isAddingDevice}
+        onOpenChange={open => !open && setIsAddingDevice(false)}
+      >
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black/50" />
+          <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-96">
+            <Dialog.Title className="text-xl font-bold mb-4 text-gray-800 dark:text-white">
+              Add Device
+            </Dialog.Title>
+            <AddDeviceForm onAddDevice={handleAddCustomDevice} />
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+
+      {/* Edit Device Dialog */}
       <Dialog.Root
         open={editingDevice !== null}
         onOpenChange={open => !open && setEditingDevice(null)}
       >
-        <div className="w-64 flex-shrink-0 bg-white dark:bg-gray-800 p-4 shadow-lg pt-16 overflow-y-auto">
-          <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">
-            Add Device
-          </h2>
-          <AddDeviceForm onAddDevice={handleAddCustomDevice} />
-        </div>
-
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/50" />
           <Dialog.Content className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-96">
@@ -220,42 +238,6 @@ function AudioDeviceArrangerApp() {
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
-
-      {/* Main content area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="bg-white dark:bg-gray-800 p-4 shadow-md flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
-            Audio Hardware Configurator
-          </h1>
-          <DarkModeToggle
-            isDarkMode={isDarkMode}
-            toggleDarkMode={toggleDarkMode}
-          />
-        </header>
-
-        {/* React Flow */}
-        <div className="flex-1 bg-gray-100 dark:bg-gray-900">
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            nodeTypes={nodeTypes}
-            defaultEdgeOptions={defaultEdgeOptions}
-            fitView
-            fitViewOptions={{ padding: 0.2, minZoom: 0.5, maxZoom: 2 }}
-            className={isDarkMode ? 'dark-flow' : ''}
-            connectionLineType={ConnectionLineType.SmoothStep}
-            connectionLineComponent={CustomConnectionLine}
-          >
-            <Controls className={isDarkMode ? 'dark-controls' : ''} />
-            <MiniMap className={isDarkMode ? 'dark-minimap' : ''} />
-            <Background color={isDarkMode ? '#555' : '#aaa'} gap={16} />
-          </ReactFlow>
-        </div>
-      </div>
     </div>
   )
 }

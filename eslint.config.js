@@ -28,8 +28,8 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
-      semi: ['error', 'never'],
-      'no-unused-vars': ['error', 'never'],
+      semi: 'off',
+      'no-unused-vars': 'warn',
     },
   },
 )

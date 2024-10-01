@@ -1,3 +1,5 @@
+// src/components/AddDeviceForm.tsx
+
 import React, { useState } from 'react'
 import { Device, Port } from '../types/devices'
 import * as Form from '@radix-ui/react-form'
@@ -18,10 +20,8 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({ onAddDevice }) => {
       name: name,
       type: type,
       gridSize,
-      // width,
-      // height,
-      inputs: [],
-      outputs: [],
+      inputs,
+      outputs,
       position: { x: 0, y: 0 },
     })
   }
@@ -93,14 +93,14 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({ onAddDevice }) => {
         <button
           type="button"
           onClick={handleAddInput}
-          className="px-2 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-800"
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
         >
           Add Input
         </button>
         <button
           type="button"
           onClick={handleAddOutput}
-          className="px-2 py-1 text-sm bg-green-500 text-white rounded-md hover:bg-green-600 dark:bg-green-700 dark:hover:bg-green-800"
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
         >
           Add Output
         </button>
@@ -135,11 +135,11 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({ onAddDevice }) => {
           </div>
         </div>
       </div>
-      <div className="flex items-center">
+      <div className="flex items-center justify-end">
         <button
-          type="submit"
+          type="button"
           onClick={handleAddDevice}
-          className="px-2 py-1 text-sm bg-purple-500 text-white rounded-md hover:bg-purple-600 dark:bg-purple-700 dark:hover:bg-purple-800 transition-colors"
+          className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
         >
           Add Device
         </button>
