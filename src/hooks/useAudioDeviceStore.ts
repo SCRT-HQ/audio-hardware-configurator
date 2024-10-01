@@ -116,7 +116,7 @@ export function useAudioDeviceStore() {
       )
       return { previousDevices }
     },
-    onError: (err, newTodo, context) => {
+    onError: (_err, _newTodo, context) => {
       queryClient.setQueryData(DEVICES_KEY, context?.previousDevices)
     },
     onSettled: () => {

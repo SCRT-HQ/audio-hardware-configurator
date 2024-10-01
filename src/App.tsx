@@ -1,6 +1,6 @@
 // src/App.tsx
 
-import React, { useState, useCallback, useEffect, useMemo } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import {
   ReactFlow,
   MiniMap,
@@ -9,8 +9,9 @@ import {
   useNodesState,
   useEdgesState,
   addEdge,
-  Connection,
+  Node,
   Edge,
+  Connection,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import './reactflow-dark.css'
@@ -36,14 +37,14 @@ function AudioDeviceArrangerApp() {
     devices,
     isLoading,
     addDevice,
-    updateDevicePosition,
+    // updateDevicePosition,
     updateDevice,
     deleteDevice,
     addConnection,
   } = useAudioDeviceStore()
 
-  const [nodes, setNodes, onNodesChange] = useNodesState([])
-  const [edges, setEdges, onEdgesChange] = useEdgesState([])
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
 
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode')
@@ -75,7 +76,7 @@ function AudioDeviceArrangerApp() {
       }))
       setNodes(flowNodes)
     }
-  }, [devices, setNodes])
+  }, [devices])
 
   const defaultEdgeOptions = useMemo(
     () => ({
@@ -98,10 +99,10 @@ function AudioDeviceArrangerApp() {
         },
       })),
     )
-  }, [isDarkMode, setEdges])
+  }, [isDarkMode])
 
   const onConnect = useCallback(
-    (params: Edge | Connection) => {
+    (params: Connection) => {
       const newEdge = {
         ...params,
         animated: true,
@@ -110,9 +111,9 @@ function AudioDeviceArrangerApp() {
       setEdges(eds => addEdge(newEdge, eds))
       addConnection({
         id: `${params.source}-${params.target}`,
-        sourceDeviceId: params.source as string,
+        sourceDeviceId: params.source,
         sourcePortId: params.sourceHandle as string,
-        targetDeviceId: params.target as string,
+        targetDeviceId: params.target,
         targetPortId: params.targetHandle as string,
       })
     },
