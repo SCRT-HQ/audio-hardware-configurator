@@ -117,7 +117,6 @@ export function useAudioDeviceStore() {
       return { previousDevices }
     },
     onError: (err, newTodo, context) => {
-      console.log('Error updating device position', err, newTodo, context)
       queryClient.setQueryData(DEVICES_KEY, context?.previousDevices)
     },
     onSettled: () => {
