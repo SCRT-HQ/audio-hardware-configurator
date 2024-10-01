@@ -1,9 +1,24 @@
 // src/components/CustomEdge.tsx
 
 import React from 'react'
-import { getBezierPath, EdgeProps } from '@xyflow/react'
+import { getSmoothStepPath, EdgeProps } from '@xyflow/react'
 
-const CustomEdge: React.FC<EdgeProps> = ({
+interface HandleElement {
+  id: string
+  position: string
+}
+
+interface CustomEdgeData {
+  sourceHandle?: HandleElement & { style?: React.CSSProperties }
+  targetHandle?: HandleElement & { style?: React.CSSProperties }
+  onDelete?: (id: string) => void
+}
+
+type CustomEdgeProps = EdgeProps & {
+  data?: CustomEdgeData
+}
+
+const CustomEdge: React.FC<CustomEdgeProps> = ({
   id,
   sourceX,
   sourceY,
@@ -13,8 +28,10 @@ const CustomEdge: React.FC<EdgeProps> = ({
   targetPosition,
   style = {},
   data,
+  // sourceHandle,
+  // targetHandle,
 }) => {
-  const [edgePath] = getBezierPath({
+  const [edgePath] = getSmoothStepPath({
     sourceX,
     sourceY,
     sourcePosition,
@@ -23,11 +40,16 @@ const CustomEdge: React.FC<EdgeProps> = ({
     targetPosition,
   })
 
+  const color =
+    data?.sourceHandle?.style?.background ||
+    data?.targetHandle?.style?.background ||
+    '#999'
+
   return (
     <>
       <path
         id={id}
-        style={{ ...style, zIndex: 1000 }}
+        style={{ ...style, stroke: String(color), zIndex: 1000 }}
         className="react-flow__edge-path"
         d={edgePath}
       />

@@ -11,10 +11,7 @@ interface CustomNodeData extends Device {
 
 const CustomNode: React.FC<{ data: CustomNodeData }> = ({ data }) => {
   return (
-    <div
-      className="px-4 py-2 shadow-md rounded-md bg-white dark:bg-gray-800 border-2 border-stone-400 dark:border-gray-600"
-      style={{ zIndex: 0 }}
-    >
+    <div className="px-4 py-2 shadow-md rounded-md bg-white dark:bg-gray-800 border-2 border-stone-400 dark:border-gray-600">
       <div className="flex">
         <div className="rounded-full w-12 h-12 flex justify-center items-center bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
           {data.type.charAt(0).toUpperCase()}
@@ -37,9 +34,16 @@ const CustomNode: React.FC<{ data: CustomNodeData }> = ({ data }) => {
               type="target"
               position={Position.Left}
               id={input.id}
-              style={{ left: -8, top: `${(index + 1) * 24}px` }}
+              style={{
+                left: -8,
+                top: `${(index + 1) * 24}px`,
+                background: input.color,
+              }}
             />
-            <span className="text-xs text-gray-600 dark:text-gray-400 ml-2">
+            <span
+              className="text-xs text-gray-600 dark:text-gray-400 ml-2"
+              style={{ color: input.color }}
+            >
               {input.name}
             </span>
           </div>
@@ -52,14 +56,21 @@ const CustomNode: React.FC<{ data: CustomNodeData }> = ({ data }) => {
         </div>
         {data.outputs.map((output: Port, index: number) => (
           <div key={output.id} className="flex items-center justify-end">
-            <span className="text-xs text-gray-600 dark:text-gray-400 mr-2">
+            <span
+              className="text-xs text-gray-600 dark:text-gray-400 mr-2"
+              style={{ color: output.color }}
+            >
               {output.name}
             </span>
             <Handle
               type="source"
               position={Position.Right}
               id={output.id}
-              style={{ right: -8, top: `${(index + 1) * 24}px` }}
+              style={{
+                right: -8,
+                top: `${(index + 1) * 24}px`,
+                background: output.color,
+              }}
             />
           </div>
         ))}

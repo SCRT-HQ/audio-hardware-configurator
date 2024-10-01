@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { Device, Port } from '../types/devices'
 import * as Form from '@radix-ui/react-form'
+import { colorOptions } from '../constants/colors'
 
 interface AddDeviceFormProps {
   onAddDevice: (device: Omit<Device, 'id'>) => void
@@ -33,6 +34,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({ onAddDevice }) => {
         id: `input-${Date.now()}`,
         name: `Input ${inputs.length + 1}`,
         type: 'input',
+        color: colorOptions[Math.floor(Math.random() * colorOptions.length)],
       },
     ])
   }
@@ -44,6 +46,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({ onAddDevice }) => {
         id: `output-${Date.now()}`,
         name: `Output ${outputs.length + 1}`,
         type: 'output',
+        color: colorOptions[Math.floor(Math.random() * colorOptions.length)],
       },
     ])
   }

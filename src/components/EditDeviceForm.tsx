@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { Device, Port } from '../types/devices'
+import { colorOptions } from '../constants/colors'
 
 interface EditDeviceFormProps {
   device: Device
@@ -27,6 +28,7 @@ const EditDeviceForm: React.FC<EditDeviceFormProps> = ({
         id: `input-${Date.now()}`,
         name: `Input ${inputs.length + 1}`,
         type: 'input',
+        color: colorOptions[Math.floor(Math.random() * colorOptions.length)],
       },
     ])
   }
@@ -38,6 +40,7 @@ const EditDeviceForm: React.FC<EditDeviceFormProps> = ({
         id: `output-${Date.now()}`,
         name: `Output ${outputs.length + 1}`,
         type: 'output',
+        color: colorOptions[Math.floor(Math.random() * colorOptions.length)],
       },
     ])
   }

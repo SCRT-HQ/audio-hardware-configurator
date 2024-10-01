@@ -4,6 +4,7 @@ export interface Port {
   id: string
   name: string
   type: 'input' | 'output'
+  color: string
 }
 
 export interface Device {

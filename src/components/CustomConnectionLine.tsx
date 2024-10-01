@@ -25,7 +25,7 @@ const CustomConnectionLine: React.FC<ConnectionLineComponentProps> = ({
     <path
       fill="none"
       stroke={connectionLineStyle?.stroke || '#999'}
-      strokeWidth={connectionLineStyle?.strokeWidth || 2}
+      strokeWidth={connectionLineStyle?.strokeWidth || 1}
       className="animated"
       d={edgePath}
     />

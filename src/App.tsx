@@ -59,7 +59,7 @@ function AudioDeviceArrangerApp() {
 
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode')
-    return saved ? JSON.parse(saved) : false
+    return saved ? JSON.parse(saved) : true
   })
 
   const [editingDevice, setEditingDevice] = useState<Device | null>(null)
@@ -67,10 +67,10 @@ function AudioDeviceArrangerApp() {
 
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(isDarkMode))
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
+    if (!isDarkMode) {
       document.documentElement.classList.remove('dark')
+    } else {
+      document.documentElement.classList.add('dark')
     }
   }, [isDarkMode])
 
@@ -117,7 +117,7 @@ function AudioDeviceArrangerApp() {
       },
       animated: true,
       zIndex: 1010,
-      type: 'arrow',
+      type: 'smoothstep',
     }),
     [isDarkMode],
   )
