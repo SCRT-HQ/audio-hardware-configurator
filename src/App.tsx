@@ -12,6 +12,8 @@ import {
   Node,
   Edge,
   Connection,
+  ConnectionLineType,
+  ConnectionLineComponent,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import './reactflow-dark.css'
@@ -30,6 +32,39 @@ const queryClient = new QueryClient()
 
 const nodeTypes = {
   customNode: CustomNode,
+}
+
+const CustomConnectionLine: ConnectionLineComponent = ({
+  fromX,
+  fromY,
+  toX,
+  toY,
+  connectionLineStyle,
+}: {
+  fromX: number
+  fromY: number
+  toX: number
+  toY: number
+  connectionLineStyle?: React.CSSProperties
+}) => {
+  // Calculate midpoint
+  const midX = (fromX + toX) / 2
+  const midY = (fromY + toY) / 2
+
+  // Create a curved path
+  const path = `M${fromX},${fromY} Q${midX},${fromY} ${midX},${midY} T${toX},${toY}`
+
+  return (
+    <g>
+      <path
+        fill="none"
+        stroke={connectionLineStyle?.stroke || '#999'}
+        strokeWidth={connectionLineStyle?.strokeWidth || 2}
+        className="animated"
+        d={path}
+      />
+    </g>
+  )
 }
 
 function AudioDeviceArrangerApp() {
@@ -212,6 +247,8 @@ function AudioDeviceArrangerApp() {
             fitView
             fitViewOptions={{ padding: 0.2, minZoom: 0.5, maxZoom: 2 }}
             className={isDarkMode ? 'dark-flow' : ''}
+            connectionLineType={ConnectionLineType.SmoothStep}
+            connectionLineComponent={CustomConnectionLine}
           >
             <Controls className={isDarkMode ? 'dark-controls' : ''} />
             <MiniMap className={isDarkMode ? 'dark-minimap' : ''} />
