@@ -1,4 +1,3 @@
-/* eslint-disable prefer-const */
 // src/hooks/useAudioDeviceStore.ts
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -52,10 +51,44 @@ const updateDevicePosition = (
   return Promise.resolve(devices.find(d => d.id === id))
 }
 
+const updateDevice = (updatedDevice: Device) => {
+  devices = devices.map(d => (d.id === updatedDevice.id ? updatedDevice : d))
+
+  // Remove connections for deleted ports
+  connections = connections.filter(conn => {
+    const sourceDevice = devices.find(d => d.id === conn.sourceDeviceId)
+    const targetDevice = devices.find(d => d.id === conn.targetDeviceId)
+    if (!sourceDevice || !targetDevice) return false
+    const sourcePort = sourceDevice.outputs.find(
+      o => o.id === conn.sourcePortId,
+    )
+    const targetPort = targetDevice.inputs.find(i => i.id === conn.targetPortId)
+    return sourcePort && targetPort
+  })
+
+  saveState()
+  return Promise.resolve(updatedDevice)
+}
+
+const deleteDevice = (id: string) => {
+  devices = devices.filter(d => d.id !== id)
+  connections = connections.filter(
+    c => c.sourceDeviceId !== id && c.targetDeviceId !== id,
+  )
+  saveState()
+  return Promise.resolve()
+}
+
 const addConnection = (connection: Connection) => {
   connections.push(connection)
   saveState()
   return Promise.resolve(connection)
+}
+
+const removeConnection = (connectionId: string) => {
+  connections = connections.filter(c => c.id !== connectionId)
+  saveState()
+  return Promise.resolve()
 }
 
 export function useAudioDeviceStore() {
@@ -77,26 +110,20 @@ export function useAudioDeviceStore() {
       queryClient.invalidateQueries({ queryKey: DEVICES_KEY })
     },
   })
+
   const updateDeviceMutation = useMutation({
-    mutationFn: (updatedDevice: Device) => {
-      devices = devices.map(d =>
-        d.id === updatedDevice.id ? updatedDevice : d,
-      )
-      saveState()
-      return Promise.resolve(updatedDevice)
-    },
+    mutationFn: updateDevice,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: DEVICES_KEY })
+      queryClient.invalidateQueries({ queryKey: CONNECTIONS_KEY })
     },
   })
+
   const deleteDeviceMutation = useMutation({
-    mutationFn: (id: string) => {
-      devices = devices.filter(d => d.id !== id)
-      saveState()
-      return Promise.resolve()
-    },
+    mutationFn: deleteDevice,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: DEVICES_KEY })
+      queryClient.invalidateQueries({ queryKey: CONNECTIONS_KEY })
     },
   })
 
@@ -108,24 +135,20 @@ export function useAudioDeviceStore() {
       id: string
       position: { x: number; y: number }
     }) => updateDevicePosition(id, position),
-    onMutate: async ({ id, position }) => {
-      await queryClient.cancelQueries({ queryKey: DEVICES_KEY })
-      const previousDevices = queryClient.getQueryData<Device[]>(DEVICES_KEY)
-      queryClient.setQueryData<Device[]>(DEVICES_KEY, old =>
-        old ? old.map(d => (d.id === id ? { ...d, position } : d)) : [],
-      )
-      return { previousDevices }
-    },
-    onError: (_err, _newTodo, context) => {
-      queryClient.setQueryData(DEVICES_KEY, context?.previousDevices)
-    },
-    onSettled: () => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: DEVICES_KEY })
     },
   })
 
   const addConnectionMutation = useMutation({
     mutationFn: addConnection,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CONNECTIONS_KEY })
+    },
+  })
+
+  const removeConnectionMutation = useMutation({
+    mutationFn: removeConnection,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: CONNECTIONS_KEY })
     },
@@ -138,6 +161,7 @@ export function useAudioDeviceStore() {
     addDevice: addDeviceMutation.mutate,
     updateDevicePosition: updateDevicePositionMutation.mutate,
     addConnection: addConnectionMutation.mutate,
+    removeConnection: removeConnectionMutation.mutate,
     updateDevice: updateDeviceMutation.mutate,
     deleteDevice: deleteDeviceMutation.mutate,
   }

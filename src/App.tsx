@@ -13,6 +13,8 @@ import {
   Edge,
   Connection,
   ConnectionLineType,
+  applyNodeChanges,
+  OnNodesChange,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import './reactflow-dark.css'
@@ -22,6 +24,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import * as Dialog from '@radix-ui/react-dialog'
 import { useAudioDeviceStore } from './hooks/useAudioDeviceStore'
 import CustomNode from './components/CustomNode'
+import CustomEdge from './components/CustomEdge'
 import DarkModeToggle from './components/DarkModeToggle'
 import AddDeviceForm from './components/AddDeviceForm'
 import { Device } from './types/devices'
@@ -34,17 +37,24 @@ const nodeTypes = {
   customNode: CustomNode,
 }
 
+const edgeTypes = {
+  custom: CustomEdge,
+}
+
 function AudioDeviceArrangerApp() {
   const {
     devices,
+    connections,
     isLoading,
     addDevice,
     updateDevice,
     deleteDevice,
     addConnection,
+    removeConnection,
+    updateDevicePosition,
   } = useAudioDeviceStore()
 
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
+  const [nodes, setNodes] = useNodesState<Node>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
 
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -64,8 +74,16 @@ function AudioDeviceArrangerApp() {
     }
   }, [isDarkMode])
 
+  const handleEdgeDelete = useCallback(
+    (edgeId: string) => {
+      removeConnection(edgeId)
+      setEdges(eds => eds.filter(e => e.id !== edgeId))
+    },
+    [removeConnection],
+  )
+
   useEffect(() => {
-    if (devices) {
+    if (devices && connections) {
       const flowNodes = devices.map(device => ({
         id: device.id,
         type: 'customNode',
@@ -77,8 +95,19 @@ function AudioDeviceArrangerApp() {
         },
       }))
       setNodes(flowNodes)
+
+      const flowEdges = connections.map(connection => ({
+        id: connection.id,
+        source: connection.sourceDeviceId,
+        target: connection.targetDeviceId,
+        sourceHandle: connection.sourcePortId,
+        targetHandle: connection.targetPortId,
+        type: 'custom',
+        data: { onDelete: handleEdgeDelete },
+      }))
+      setEdges(flowEdges)
     }
-  }, [devices])
+  }, [devices, connections, handleEdgeDelete])
 
   const defaultEdgeOptions = useMemo(
     () => ({
@@ -103,6 +132,20 @@ function AudioDeviceArrangerApp() {
     )
   }, [isDarkMode])
 
+  const onNodesChange: OnNodesChange = useCallback(
+    changes => {
+      setNodes(nds => applyNodeChanges(changes, nds))
+    },
+    [setNodes],
+  )
+
+  const onNodeDragStop = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      updateDevicePosition({ id: node.id, position: node.position })
+    },
+    [updateDevicePosition],
+  )
+
   const onConnect = useCallback(
     (params: Connection) => {
       const newEdge = {
@@ -112,7 +155,7 @@ function AudioDeviceArrangerApp() {
       }
       setEdges(eds => addEdge(newEdge, eds))
       addConnection({
-        id: `${params.source}-${params.target}`,
+        id: `${params.source}-${params.target}-${params.sourceHandle}-${params.targetHandle}`,
         sourceDeviceId: params.source,
         sourcePortId: params.sourceHandle as string,
         targetDeviceId: params.target,
@@ -120,6 +163,15 @@ function AudioDeviceArrangerApp() {
       })
     },
     [setEdges, addConnection, isDarkMode],
+  )
+
+  const onEdgesDelete = useCallback(
+    (edgesToDelete: Edge[]) => {
+      edgesToDelete.forEach(edge => {
+        removeConnection(edge.id)
+      })
+    },
+    [removeConnection],
   )
 
   const handleAddCustomDevice = (deviceData: Omit<Device, 'id'>) => {
@@ -143,10 +195,6 @@ function AudioDeviceArrangerApp() {
 
   const handleDeleteDevice = (id: string) => {
     deleteDevice(id)
-    setNodes(nds => nds.filter(node => node.id !== id))
-    setEdges(eds =>
-      eds.filter(edge => edge.source !== id && edge.target !== id),
-    )
   }
 
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode)
@@ -187,7 +235,12 @@ function AudioDeviceArrangerApp() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
+          onEdgesDelete={onEdgesDelete}
+          onNodeDragStop={onNodeDragStop}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
+          proOptions={{ hideAttribution: true }}
+          style={{ zIndex: 0 }}
           defaultEdgeOptions={defaultEdgeOptions}
           fitView
           fitViewOptions={{ padding: 0.2, minZoom: 0.5, maxZoom: 2 }}

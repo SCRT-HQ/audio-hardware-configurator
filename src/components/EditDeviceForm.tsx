@@ -42,6 +42,34 @@ const EditDeviceForm: React.FC<EditDeviceFormProps> = ({
     ])
   }
 
+  const handleRemoveInput = (id: string) => {
+    setInputs(inputs.filter(input => input.id !== id))
+  }
+
+  const handleRemoveOutput = (id: string) => {
+    setOutputs(outputs.filter(output => output.id !== id))
+  }
+
+  const handleUpdatePort = (
+    portType: 'input' | 'output',
+    id: string,
+    newName: string,
+  ) => {
+    if (portType === 'input') {
+      setInputs(
+        inputs.map(input =>
+          input.id === id ? { ...input, name: newName } : input,
+        ),
+      )
+    } else {
+      setOutputs(
+        outputs.map(output =>
+          output.id === id ? { ...output, name: newName } : output,
+        ),
+      )
+    }
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onUpdateDevice({
@@ -68,10 +96,10 @@ const EditDeviceForm: React.FC<EditDeviceFormProps> = ({
           id="name"
           value={name}
           onChange={e => setName(e.target.value)}
-          required
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
         />
       </div>
+
       <div>
         <label
           htmlFor="type"
@@ -84,10 +112,10 @@ const EditDeviceForm: React.FC<EditDeviceFormProps> = ({
           id="type"
           value={type}
           onChange={e => setType(e.target.value)}
-          required
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
         />
       </div>
+
       <div>
         <label
           htmlFor="gridSize"
@@ -100,36 +128,74 @@ const EditDeviceForm: React.FC<EditDeviceFormProps> = ({
           id="gridSize"
           value={gridSize}
           onChange={e => setGridSize(Number(e.target.value))}
-          required
-          min="100"
-          max="2000"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
         />
       </div>
+
       <div>
+        <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">
+          Inputs
+        </h3>
+        {inputs.map(input => (
+          <div key={input.id} className="flex items-center mb-2">
+            <input
+              type="text"
+              value={input.name}
+              onChange={e =>
+                handleUpdatePort('input', input.id, e.target.value)
+              }
+              className="flex-grow mr-2 p-1 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            />
+            <button
+              type="button"
+              onClick={() => handleRemoveInput(input.id)}
+              className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
         <button
           type="button"
           onClick={handleAddInput}
-          className="mr-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           Add Input
         </button>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-200">
+          Outputs
+        </h3>
+        {outputs.map(output => (
+          <div key={output.id} className="flex items-center mb-2">
+            <input
+              type="text"
+              value={output.name}
+              onChange={e =>
+                handleUpdatePort('output', output.id, e.target.value)
+              }
+              className="flex-grow mr-2 p-1 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            />
+            <button
+              type="button"
+              onClick={() => handleRemoveOutput(output.id)}
+              className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
         <button
           type="button"
           onClick={handleAddOutput}
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+          className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
         >
           Add Output
         </button>
       </div>
-      <div>
-        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          Inputs: {inputs.length}
-        </h4>
-        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          Outputs: {outputs.length}
-        </h4>
-      </div>
+
       <div className="flex justify-between">
         <button
           type="submit"
