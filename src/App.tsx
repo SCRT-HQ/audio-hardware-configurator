@@ -142,7 +142,7 @@ function AudioDeviceArrangerApp() {
   )
 
   const onNodeDragStop = useCallback(
-    (event: React.MouseEvent, node: Node) => {
+    (_: React.MouseEvent, node: Node) => {
       updateDevicePosition({ id: node.id, position: node.position })
     },
     [updateDevicePosition],
